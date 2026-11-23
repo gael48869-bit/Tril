@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tril Rey • v1.9</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body {
+      margin: 0;
+      background: #0b0d12;
+      color: #f3f4f6;
+      padding: 16px;
+    }
+    .app {
+      max-width: 680px;
+      margin: 0 auto;
+      background: #121620;
+      border: 1px solid #232a3b;
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #8ab4ff;
+    }
+    .badge {
+      background: #1b2232;
+      border: 1px solid #2d374e;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: #cbd5e1;
+    }
+    .grid-presets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .preset {
+      background: #171c28;
+      border: 1px solid #262f45;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: left;
+      color: #fff;
+      cursor: pointer;
+    }
+    .preset strong { display: block; font-size: 0.95rem; margin-bottom: 3px; }
+    .preset span { font-size: 0.8rem; color: #94a3b8; }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin: 12px 0 6px;
+    }
+    textarea, select {
+      width: 100%;
+      background: #0c0f17;
+      border: 1px solid #263047;
+      color: #f8fafc;
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 0.95rem;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .levels {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .lvl-btn {
+      background: #171c28;
+      border: 1px solid #2a344d;
+      color: #e2e8f0;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .lvl-btn.active {
+      background: #4f46e5;
+      border-color: #6366f1;
+      color: #fff;
+    }
+    .gen-btn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 13px;
+      border: none;
+      border-radius: 12px;
+      background: #5b4df5;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .status {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #34d399;
+    }
+    .output-box {
+      margin-top: 18px;
+      background: #151a26;
+      border: 1px solid #263047;
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .out-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .actions { display: flex; gap: 8px; }
+    .small-btn {
+      background: #222a3d;
+      border: 1px solid #33415e;
+      color: #f1f5f9;
+      padding: 6px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    pre {
+      margin: 0;
+      background: #0b0e15;
+      border: 1px solid #20283b;
+      border-radius: 10px;
+      padding: 12px;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 110px;
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <div class="title">Tril Rey • v1.9</div>
+      <div class="badge" id="historyBadge">Historial (0)</div>
+    </div>
+
+    <div class="grid-presets">
+      <button class="preset" onclick="usePreset('Crea un script de fly', 'Lua (Executor / Delta)', 'trilrey_fly.lua')">
+        <strong>Fly (Lua)</strong>
+        <span>Volar en el juego</span>
+      </button>
+      <button class="preset" onclick="usePreset('Crea un script para cambiar de servidor', 'Lua (Executor / Delta)', 'trilrey_serverhop.lua')">
+        <strong>Server Hop (Lua)</strong>
+        <span>Cambiar de servidor</span>
+      </button>
+      <button class="preset" onclick="usePreset('Crea un script de velocidad y salto', 'Lua (Executor / Delta)', 'trilrey_speed_jump.lua')">
+        <strong>Speed & Jump (Lua)</strong>
+        <span>Velocidad y salto</span>
+      </button>
+      <button class="preset" onclick="usePreset('Crea un script base en Python', 'Script Python', 'trilrey_script.py')">
+        <strong>Script Python</strong>
+        <span>Código en Python</span>
+      </button>
+    </div>
+
+    <label for="promptInput">Escribí cualquier cosa para generar el código</label>
+    <textarea id="promptInput">Crea un script de fly</textarea>
+
+    <div class="row">
+      <div>
+        <label for="typeSelect">Tipo de código</label>
+        <select id="typeSelect">
+          <option value="Lua (Executor / Delta)" selected>Lua (Executor / Delta)</option>
+          <option value="Script Python">Script Python</option>
+        </select>
+      </div>
+      <div>
+        <label for="styleSelect">Estilo</label>
+        <select id="styleSelect">
+          <option value="Directo y listo" selected>Directo y listo</option>
+          <option value="Comentado paso a paso">Comentado paso a paso</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Nivel de detalle</label>
+    <div class="levels">
+      <button type="button" class="lvl-btn active" data-level="Rápido" onclick="setLevel(this)">Rápido</button>
+      <button type="button" class="lvl-btn" data-level="Estándar" onclick="setLevel(this)">Estándar</button>
+      <button type="button" class="lvl-btn" data-level="Completo" onclick="setLevel(this)">Completo</button>
+    </div>
+
+    <button type="button" class="gen-btn" onclick="generateCode()">Generar Código</button>
+    <div class="status" id="statusText">Listo. Tocá "Generar Código".</div>
+
+    <div class="output-box">
+      <div class="out-head">
+        <span id="fileNameLabel">trilrey_fly.lua</span>
+        <div class="actions">
+          <button type="button" class="small-btn" onclick="copyCode()">Copiar</button>
+          <button type="button" class="small-btn" onclick="downloadCode()">Descargar</button>
+        </div>
+      </div>
+      <pre id="codeOutput">Tu código generado aparecerá acá listo para copiar y pegar...</pre>
+    </div>
+  </div>
+
+  <script>
+    let currentLevel = "Rápido";
+    let currentFile = "trilrey_fly.lua";
+    let historyCount = 0;
+
+    function usePreset(promptText, typeText, fileName) {
+      document.getElementById("promptInput").value = promptText;
+      document.getElementById("typeSelect").value = typeText;
+      currentFile = fileName;
+      document.getElementById("fileNameLabel").textContent = fileName;
+      document.getElementById("statusText").textContent = 'Listo. Tocá "Generar Código".';
+    }
+
+    function setLevel(btn) {
+      document.querySelectorAll(".lvl-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentLevel = btn.dataset.level;
+    }
+
+    function generateCode() {
+      const prompt = document.getElementById("promptInput").value.trim() || "Script personalizado";
+      const tipo = document.getElementById("typeSelect").value;
+      const estilo = document.getElementById("styleSelect").value;
+      const isPython = tipo.includes("Python");
+
+      currentFile = isPython ? "trilrey_script.py" : "trilrey_fly.lua";
+      document.getElementById("fileNameLabel").textContent = currentFile;
+
+      const code = isPython
+`# Tril Rey v1.9 | Estilo: ${estilo} | Detalle: ${currentLevel}
+# Pedido: ${prompt}
+
+def main():
+    print("Tril Rey v1.9 activo -> ${prompt.replace('"', "'")}")
+
+if __name__ == "__main__":
+    main()`;
+
+      document.getElementById("codeOutput").textContent = code;
+      historyCount += 1;
+      document.getElementById("historyBadge").textContent = `Historial (${historyCount})`;
+      document.getElementById("statusText").textContent = "Código generado.";
+    }
+
+    function copyCode() {
+      const text = document.getElementById("codeOutput").textContent;
+      navigator.clipboard?.writeText(text);
+      document.getElementById("statusText").textContent = "Copiado al portapapeles.";
+    }
+
+    function downloadCode() {
+      const text = document.getElementById("codeOutput").textContent;
+      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = currentFile;
+      a.click();
+      URL.revokeObjectURL(url);
+      document.getElementById("statusText").textContent = `Descargado ${currentFile}.`;
+    }
+  </script>
+</body>
+  </html>
+      
